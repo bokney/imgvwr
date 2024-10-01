@@ -5,7 +5,7 @@ from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 from pathlib import Path
 
-class IMGVWR:
+class TK_IMGVWR:
 
     def init_images(self, folder_path):
         self.folder_path = folder_path
@@ -100,7 +100,7 @@ menu_bar = tk.Menu(root)
 
 str_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data'
 folder_path = Path(str_path)
-app = IMGVWR(root, folder_path)
+app = TK_IMGVWR(root, folder_path)
 
 file_menu = tk.Menu(menu_bar, tearoff = 0)
 file_menu.add_command(label = "Open", command = app.open)
