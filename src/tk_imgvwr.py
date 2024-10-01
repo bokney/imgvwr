@@ -1,18 +1,23 @@
 
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
+from pathlib import Path
 
 class IMGVWR:
-    def __init__(self, root: tk.Tk, folder_path: str = os.getcwd()) -> None:
-        self.root = root
+
+    def init_images(self, folder_path):
         self.folder_path = folder_path
         self.images = [
             f for f in os.listdir(folder_path)
             if f.lower().endswith(('png', 'jpg', 'jpeg', 'gif'))
             ]
         self.image_index = 0
+
+    def __init__(self, root: tk.Tk, folder_path: Path = os.getcwd()) -> None:
+        self.root = root
+        self.init_images(folder_path)
 
         self.fill_window: bool = False
         self.full_screen: bool = True
@@ -71,19 +76,37 @@ class IMGVWR:
         self.image_index = (self.image_index + 1) % len(self.images)
         self.load_image()
 
-def open():
-    x = 0
+    def open(self) -> Path:
+        folder_path = filedialog.askdirectory(
+            title="Select a folder"
+        )
+
+        if folder_path:
+        
+            folder = Path(folder_path)
+            image_extensions = {'.jpg', '.jpeg', '.png', '.gif'}
+            contains_images = any(file.suffix.lower() in image_extensions for file in folder.iterdir() if file.is_file())
+
+            if contains_images:
+                print(f"selected {folder_path}")
+                self.init_images(folder_path)
+                self.load_image()
+            else:
+                print(f"Folder {folder_path} contains no images.")
+
 
 root = tk.Tk()
 menu_bar = tk.Menu(root)
 
+str_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data'
+folder_path = Path(str_path)
+app = IMGVWR(root, folder_path)
+
 file_menu = tk.Menu(menu_bar, tearoff = 0)
-file_menu.add_command(label = "Open", command = open)
+file_menu.add_command(label = "Open", command = app.open)
 file_menu.add_separator()
 file_menu.add_command(label = "Exit", command = root.quit)
 menu_bar.add_cascade(label = "File", menu = file_menu)
 root.config(menu = menu_bar)
 
-folder_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/data'
-app = IMGVWR(root, folder_path)
 root.mainloop()
