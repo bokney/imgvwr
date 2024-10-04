@@ -21,12 +21,26 @@ class QT_IMGVWR(QtWidgets.QMainWindow):
         self.image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.image_label)
 
+        # image vars
+        self.images = []
+        self.folder_path = None
+        self.image_index = 0
+        self.init_image_data()
+
         # window options
         self.fill_window: bool = False
         self.full_screen: bool = True
 
-    def init_image_data(self, folder_path: Path) -> None:
+    def init_image_data(self, folder_path: Path | None) -> None:
         self.folder_path = folder_path
+        self.image_index = 0
+        self.images.clear()
+        if self.folder_path:
+            self.images = [
+                f for f in os.listdir(self.folder_path)
+                if f.lower().endswith(('.png', '.gif', '.jpeg', '.jpg'))
+                ]
+            # if self.images
 
     def toggle_fill_window(self) -> None:
         self.fill_window = not self.fill_window
@@ -44,11 +58,24 @@ class QT_IMGVWR(QtWidgets.QMainWindow):
             self.image_label.setPixmap(pixmap)
             self.image_label.setScaledContents(True)
 
-    def prev_image(self) -> None:
-        pass
+    def get_current_image_path(self) -> Path:
+        return Path(self.folder_path) / self.images[self.image_index]
 
     def prev_image(self) -> None:
-        pass
+        if self.images:
+            self.image_index = (self.image_index - 1) % len(self.images)
+            self.load_image(self.get_current_image_path())
+
+    def next_image(self) -> None:
+        if self.images:
+            self.image_index = (self.image_index + 1) % len(self.images)
+            self.load_image(self.get_current_image_path())
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+        if event.key() == QtCore.Qt.Key.Key_Left:
+            self.prev_image()
+        elif event.key() == QtCore.Qt.Key.Key_Right:
+            self.next_image()
 
     def open(self) -> Path:
         pass
